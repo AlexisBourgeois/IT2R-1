@@ -26,6 +26,7 @@ extern ARM_DRIVER_USART Driver_USART1;
 char reponseLidarScan[7] = {0xA5, 0x5A, 0x05, 0x00, 0x00, 0x40, 0x81};		//Definition de la réponse du LIDAR
 char etatReponse = 0;			
 char tabDonnee[2000];
+short env[360];
 
 extern GLCD_FONT GLCD_Font_6x8;
 extern GLCD_FONT GLCD_Font_16x24;
@@ -108,6 +109,8 @@ int main (void) {
 
 void LectureLidar(void const * argument){
 	char tabPC[100];
+
+	//char erreur;
 	int i;
 	
 	osSignalWait(0x01, osWaitForever);
@@ -121,11 +124,42 @@ void LectureLidar(void const * argument){
 		stopLidar();
 		etatReponse = 0;
 		
+		//Envoi des données récupérées au PC
 		for(i=0;i<400;i++){
-			sprintf(tabPC,"1: 0x%0.2x\n\r2: 0x%0.2x\n\r3: 0x%0.2x\n\r4: 0x%0.2x\n\r5: 0x%0.2x \r\n",tabDonnee[5*i],tabDonnee[5*i+1],tabDonnee[5*i+2],tabDonnee[5*i+3],tabDonnee[5*i+4]);
+			/*sprintf(tabPC,"1: 0x%0.2x\n\r2: 0x%0.2x\n\r3: 0x%0.2x\n\r4: 0x%0.2x\n\r5: 0x%0.2x \r\n",tabDonnee[5*i],tabDonnee[5*i+1],tabDonnee[5*i+2],tabDonnee[5*i+3],tabDonnee[5*i+4]);
 			Driver_USART1.Send(tabPC,100);
-			while(Driver_USART1.GetStatus().tx_busy == 1); // attente buffer TX vide
-		}		
+			while(Driver_USART1.GetStatus().tx_busy == 1); // attente buffer TX vide*/
+			
+			env[((tabDonnee[5*i+1]>>1)|(tabDonnee[5*i+2]<<7))>>6] = (tabDonnee[5*i+3]|(tabDonnee[5*i+4]<<8))/40;
+		}
+		for(i=0;i<360;i++){
+			sprintf(tabPC,"Angle:%3d° , Distance:%5d cm\r\n",i,env[i]);
+			Driver_USART1.Send(tabPC,100);
+			while(Driver_USART1.GetStatus().tx_busy == 1);
+		}
+		
+		//Vérification des données
+		/*erreur = 0;
+		for(i=0;i<400;i++){
+			if((tabDonnee[5*i+1]&0x01) == 0x00) erreur = 1;
+			if(((tabDonnee[5*i]&0x03) == 0x00)||(tabDonnee[5*i]&0x03) == 0x03) erreur = 1;
+		}
+			if(erreur == 1)
+			{
+				sprintf(tabPC,"Problème!\n\r");
+				Driver_USART1.Send(tabPC,100);
+				while(Driver_USART1.GetStatus().tx_busy == 1); // attente buffer TX vide
+			}
+			else
+			{
+				sprintf(tabPC,"RAS !\n\r\0");
+				Driver_USART1.Send(tabPC,8);
+				while(Driver_USART1.GetStatus().tx_busy == 1); // attente buffer TX vide
+			}*/
+			
+		//Traitement des données récupérées par le Lidar
+			
+			
 	}
 }
 
