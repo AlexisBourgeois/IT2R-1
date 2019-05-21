@@ -1,0 +1,22 @@
+--cpu Cortex-M3
+".\objects\adc.o"
+".\objects\gpio.o"
+".\objects\pilotageenvoie.o"
+".\objects\basecan.o"
+".\objects\nunchuk.o"
+".\objects\glcd_fonts.o"
+".\objects\glcd_mcb1700.o"
+"C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.2.0\CMSIS\RTOS\RTX\LIB\ARM\RTX_CM3.lib"
+".\objects\rtx_conf_cm.o"
+".\objects\i2c_lpc17xx.o"
+".\objects\ssp_lpc17xx.o"
+".\objects\uart_lpc17xx.o"
+".\objects\gpdma_lpc17xx.o"
+".\objects\gpio_lpc17xx.o"
+".\objects\pin_lpc17xx.o"
+".\objects\startup_lpc17xx.o"
+".\objects\system_lpc17xx.o"
+--strict --scatter ".\Objects\CAN_IT2R.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\CAN_IT2R.map" -o .\Objects\CAN_IT2R.axf
